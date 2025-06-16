@@ -31,9 +31,10 @@ const App = () => {
 
           <Route element={<Layout />}>
             <Route path="/" element={<Beranda />} />
-            <Route path="/detail-project/:id" element={<Detail />} />
-            <Route path="/all-project" element={<Project />} />
-            {/* <Route path="/job-vacancy/:id" element={<Detail />} /> */}
+
+            {/* Projects Route */}
+            <Route path="/projects" element={<Project />} />
+            <Route path="/projects/:id" element={<Detail />} />
           </Route>
 
           <Route path="/login" element={<Login />} />
@@ -47,9 +48,9 @@ const App = () => {
             {/* <Route path="/category/create" element={<Form />} />
             <Route path="/category/edit-category/:id" element={<Form />} /> */}
 
-            <Route path="/project" element={<ManageProject />} />
-            <Route path="/project/create" element={<Form />} />
-            <Route path="/project/edit/:id" element={<Form />} />
+            <Route path="/dashboard/projects" element={<ManageProject />} />
+            <Route path="/dashboard/projects/create" element={<Form />} />
+            <Route path="/dashboard/projects/:id/edit" element={<Form />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
