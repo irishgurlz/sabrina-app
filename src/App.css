@@ -1,0 +1,74 @@
+.typing-effect {
+  width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 2px solid black;
+  animation:
+    typing 2s steps(20, end) forwards,
+    blink 0.7s step-end infinite,
+    cursor-hide 0.01s forwards; 
+  animation-delay:
+    0s,        
+    0s,           
+    2s;          
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 50% }
+}
+
+@keyframes blink {
+  0%, 100% { border-color: transparent }
+  100% { border-color: black }
+}
+
+@keyframes cursor-hide {
+  to { border-right-width: 0; }
+}
+
+
+@keyframes fadeSlideRight {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeSlideRight {
+  animation: fadeSlideRight 0.8s ease forwards;
+}
+
+@keyframes fadeSlideLeft{
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeSlideLeft {
+  animation: fadeSlideLeft 0.8s ease forwards;
+}
+
+@keyframes fadeSlideUp{
+  0% {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeSlideUp {
+  animation: fadeSlideUp 0.8s ease forwards;
+}
