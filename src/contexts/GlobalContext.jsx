@@ -102,6 +102,20 @@ export const GlobalProvider = ({ children }) => {
       });
   };
 
+  const fetchArticles = () => {
+    setLoading(true);
+    axios
+      .get("https://api.kyuib.my.id/api/v1/articles")
+      .then((res) => {
+        setData(res.data.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
     fetchProjects();
     axios
@@ -128,6 +142,7 @@ export const GlobalProvider = ({ children }) => {
         data,
         loading,
         fetchProjects,
+        fetchArticles,
         formatRupiah,
         fetchCategories,
       }}

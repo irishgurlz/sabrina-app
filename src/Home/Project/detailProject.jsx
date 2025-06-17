@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import Cookies from "js-cookie";
-import '../App.css';
+import '../../App.css';
 
-const Beranda = () => {
+const DetailProject = () => {
   const [projectDetail, setProjectDetail] = useState(null);
   const [projectImage, setProjectImage] = useState([]);
   const [singleImage, setSingleImage] = useState(null);
@@ -17,9 +17,6 @@ const Beranda = () => {
 
   useEffect(() => {
     const token = Cookies.get('token');
-    if (token) {
-      navigate('/dashboard');
-    }
 
     if (!id) return;
 
@@ -70,8 +67,12 @@ const Beranda = () => {
     setSelectedImageId(null);
   };
 
+  const handleEditPage = (Project) => {
+    navigate(`/dashboard/projects/${Project}/edit`)
+  };
+
   const handleArticleProject = (project) => {
-    navigate(`/projects/${project}/articles`);
+    navigate(`/dashboard/projects/${project}/articles`);
   };
 
   return (
@@ -118,14 +119,26 @@ const Beranda = () => {
             </div>
           </div>
 
-          <div className="flex gap-2 justify-start items-center">
+          <div className="flex gap-2 justify-center items-center">
             <button onClick={() => handleArticleProject(projectDetail?.attributes?.slug)} className="bg-purple-400 text-white font-semibold px-5 lg:px-8 py-1 rounded-lg shadow-lg h-8 hover:bg-purple-500 transition mt-4">
                 Go to Article
             </button>
+            {/* 
+            <Link to={`/dashboard/articles/${projectDetail?.relationships?.articles}`} className="bg-purple-400 text-white font-semibold px-5 lg:px-8 py-1 rounded-lg shadow-lg h-8 hover:bg-purple-500 transition mt-4">
+                Go to Article
+            </Link> */}
 
             <Link to={projectDetail?.attributes?.redirect_url} className="bg-pink-400 text-white font-semibold px-5 lg:px-8 py-1 rounded-lg shadow-lg h-8 hover:bg-pink-500 transition mt-4">
                 Redirect Link
             </Link>
+
+            <div className="mt-4">
+                <button onClick={() => handleEditPage(projectDetail?.attributes?.slug)} className="bg-orange-400 hover:bg-orange-500 shadow-xl rounded-lg h-[2rem] w-[5rem] flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-white">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                </svg>
+                </button>
+            </div>
           </div>
         </div>
       </div>
@@ -133,4 +146,4 @@ const Beranda = () => {
   );
 };
 
-export default Beranda;
+export default DetailProject;

@@ -22,19 +22,20 @@ const Beranda = () => {
   const navigate = useNavigate();
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [projectCategoryVisible, setProjectCategoryVisible] = useState(false);
+  const [page,setPage ] = useState([]);
 
   const fetchProjects = async () => {
-    axios
-      .get(`${API_BASE_URL}/projects`)
-      .then((res) => {
-        setDataProject(res.data.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setLoading(false);
-      }); 
+    try {
+      const res = await axios.get(`${API_BASE_URL}/projects`);
+      setDataProject(res.data.data);
+      setPage(res.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   const fetchCategories = async () => {
     axios
@@ -95,11 +96,29 @@ const Beranda = () => {
     navigate(`/detail-project/${project}`);
   };
 
+  const handlePagination = (url) => {
+    if (!url) return;
+
+    setLoading(true);
+    axios
+      .get(url)
+      .then((res) => {
+        setDataProject(res.data.data);
+        setPage(res.data); 
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   return (
     <section className="bg-white">
-      <div className="mt-24 px-4 md:px-8 lg:px-16 mx-auto animate-fadeSlideUp">
+      <div className="mt-24 px-4 md:px-8 lg:px-16 mx-auto animate-fadeSlideUp ">
         {/* Header */}
-        <div className="w-full text-center">
+        <div className="w-full text-center ">
           <h1 className="text-xl md:text-4xl font-bold text-black mb-6">
             My Project
           </h1>
@@ -108,8 +127,7 @@ const Beranda = () => {
         {/* Search Box */}
         <div className="w-full py-6">
           <div className="relative">
-            <input
-              className="w-full bg-white placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-3xl pl-3 pr-28 py-4 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-lg focus:shadow"
+            <input className="w-full bg-white placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-3xl pl-3 pr-28 py-4 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-lg focus:shadow"
               placeholder="Search Here..."
               onChange={(e) => handleChange("title", e.target.value)}
               onKeyDown={(e) => {
@@ -264,6 +282,21 @@ const Beranda = () => {
                 </div>
               </div>
             ))}
+        </div>
+          
+        {console.log("Page: ", page) }
+        <div className="w-full flex justify-center py-4 mb-2">
+          {page?.links && (
+            <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-4 py-2 shadow-sm">
+              <button disabled={!page.links.first} onClick={() => handlePagination(page.links.first)} className="px-3 py-1 rounded-md transition hover:bg-blue-100 hover:text-blue-600 disabled:text-gray-400 disabled:cursor-not-allowed">First</button>
+              <button disabled={!page.links.prev} onClick={() => handlePagination(page.links.prev)} className="px-3 py-1 rounded-md transition hover:bg-blue-100 hover:text-blue-600 disabled:text-gray-400 disabled:cursor-not-allowed">Prev</button>
+              <div className="bg-blue-300 rounded-md py-1 px-3">
+                <span className="text-sm font-semibold text-gray-700 ">{page.meta?.current_page}</span>
+              </div>
+              <button disabled={!page.links.next} onClick={() => handlePagination(page.links.next)} className="px-3 py-1 rounded-md transition hover:bg-blue-100 hover:text-blue-600 disabled:text-gray-400 disabled:cursor-not-allowed">Next</button>
+              <button disabled={!page.links.last} onClick={() => handlePagination(page.links.last)} className="px-3 py-1 rounded-md transition hover:bg-blue-100 hover:text-blue-600 disabled:text-gray-400 disabled:cursor-not-allowed">Last</button>
+            </div>
+          )}
         </div>
       </div>
     </section>

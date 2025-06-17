@@ -9,13 +9,7 @@ import ProjectCard from "./component/projectCard";
 import ArticleCard from "./component/articleCard";
 
 const Beranda = () => {
-  const {
-    inputValues = {},
-    handleChange,
-    handleSearch,
-    HandleSalary,
-    filtereddataProject = [],
-  } = useContext(GlobalContext);
+
   const [dataProject, setDataProject] = useState([]);
   const [dataArticle, setDataArticle] = useState([]);
   const [dataUser, setDataUser] = useState([]);

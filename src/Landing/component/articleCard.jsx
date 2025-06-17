@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
+
 
 export default function ArticleCard({ article, skeleton }) {
   const navigate = useNavigate();
   const [loaded, setLoaded] = useState(false);
+  const token = Cookies.get('token');
+
 
   useEffect(() => {
     if (!skeleton) {
@@ -14,8 +18,13 @@ export default function ArticleCard({ article, skeleton }) {
   }, [article, skeleton]);
 
   const handleDetailArticle = (article) => {
-    if (article) {
-      navigate(`/articles/${article.attributes.slug}`);
+    if(!token){
+      if (article) {
+        navigate(`/articles/${article.attributes.slug}`);
+      }
+    }
+    else{
+      navigate(`/dashboard/articles/${article.attributes.slug}`);
     }
   };
 
@@ -35,12 +44,12 @@ export default function ArticleCard({ article, skeleton }) {
         {skeleton ? (
           <div className="w-2/3 h-4 rounded-lg bg-slate-300"></div>
         ) : (
-          <h2
+          <div
             className="font-bold overflow-hidden text-ellipsis whitespace-nowrap w-full max-w-full transition underline-offset-2 hover:cursor-pointer hover:underline active:text-pink-400"
             onClick={() => handleDetailArticle(article)}
           >
             {article.attributes.title}
-          </h2>
+          </div>
         )}
       </div>
     </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { GlobalContext } from "../contexts/GlobalContext";
+import { GlobalContext } from "../../contexts/GlobalContext";
 
 const Form = () => {
   const navigate = useNavigate();
@@ -10,6 +10,8 @@ const Form = () => {
   const { fetchProjects } = useContext(GlobalContext);
   const [dataCategory, setDataCategory] = useState([]);
   const [name, setName] = useState('');
+  const [selectedHeroImage, setSelectedHeroImage] = useState(null);
+
 
   const [formData, setFormData] = useState({
     title: '',
@@ -80,30 +82,35 @@ const Form = () => {
     formToSend.append("start_date", formData.start_date);
     formToSend.append("finish_date", formData.finish_date);
     formToSend.append("category_id", formData.category_id);
-    formToSend.append("hero_image", formData.hero_image_url); 
+    
+    console.log("Selected image:", selectedHeroImage);
+    if (selectedHeroImage) {
+      formToSend.append("hero_image", selectedHeroImage);
+    }
 
-    const token = Cookies.get("token");
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data"
-      }
+        "Content-Type": "multipart/form-data",
+      },
     };
 
     const request = isEdit
-      ? axios.put(`https://api.kyuib.my.id/api/v1/projects/${id}`, formToSend, config)
+      ? axios.post(`https://api.kyuib.my.id/api/v1/projects/${id}?_method=PUT`, formToSend, config)
       : axios.post(`https://api.kyuib.my.id/api/v1/projects`, formToSend, config);
 
     request
       .then(() => {
         fetchProjects();
-        navigate("/project");
+        navigate("/dashboard/projects");
       })
       .catch((err) => {
         console.error("Submit error:", err.response?.data || err.message);
         alert("Failed to submit project, please check your input.");
       });
   };
+
+
 
   return (
     <section className="min-h-screen bg-white flex items-center justify-center px-4 py-10">
@@ -118,7 +125,7 @@ const Form = () => {
           
           <div>
             <span className="block text-sm font-medium text-gray-700 mb-1 ml-2">Hero Image</span>
-            <input type="file" accept="image/*" onChange={(e) => handleChange("hero_image_url", e.target.files[0])} className="border border-gray-300 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+            <input type="file" accept="image/*"  onChange={(e) => setSelectedHeroImage(e.target.files[0])} className="border border-gray-300 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" required />
           </div>
 
           <div>
@@ -153,7 +160,7 @@ const Form = () => {
             </select>
           </div>
           <div className="flex justify-between md:col-span-2 mt-4">
-            <button type="button" onClick={() => navigate("/project")} className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium rounded-xl transition">Back</button>
+            <button type="button" onClick={() => navigate("/dashboard/projects")} className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium rounded-xl transition">Back</button>
             <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition">{isEdit ? "Update Project" : "Create Project"}</button>
           </div>
         </form>
