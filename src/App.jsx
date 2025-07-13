@@ -27,6 +27,7 @@ import DetailArticle from "./Home/Article/detailArticle";
 import FormArticle from "./Home/Article/formArticle";
 import ArticleProject from "./Home/Project/articleProject";
 import ArticleProjectLanding from "./Landing/articleProject";
+import ManageLanding from './Home/ManageLanding/landing';
 
 
 import NotFound from './NotFound'; 
@@ -55,7 +56,7 @@ const App = () => {
 
           <Route element={<LayoutHome />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/category" element={<Category />} />
+            <Route path="/dashboard/category" element={<Category />} />
             <Route path="/dashboard/projects" element={<ManageProject />} />
             <Route path="/dashboard/projects/create" element={<Form />} />
             <Route path="/dashboard/projects/:id/edit" element={<Form />} />
@@ -66,6 +67,9 @@ const App = () => {
             <Route path="/dashboard/articles/:id" element={<DetailArticle />} />
             <Route path="/dashboard/articles/create" element={<FormArticle />} />
             <Route path="/dashboard/articles/:id/edit" element={<FormArticle />} />
+
+            <Route path="/dashboard/landing" element={<ManageLanding />} />
+
 
           </Route>
 

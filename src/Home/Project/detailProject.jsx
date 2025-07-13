@@ -120,9 +120,9 @@ const DetailProject = () => {
           </div>
 
           <div className="flex gap-2 justify-center items-center">
-            <button onClick={() => handleArticleProject(projectDetail?.attributes?.slug)} className="bg-purple-400 text-white font-semibold px-5 lg:px-8 py-1 rounded-lg shadow-lg h-8 hover:bg-purple-500 transition mt-4">
+            {/* <button onClick={() => handleArticleProject(projectDetail?.attributes?.slug)} className="bg-purple-400 text-white font-semibold px-5 lg:px-8 py-1 rounded-lg shadow-lg h-8 hover:bg-purple-500 transition mt-4">
                 Go to Article
-            </button>
+            </button> */}
             {/* 
             <Link to={`/dashboard/articles/${projectDetail?.relationships?.articles}`} className="bg-purple-400 text-white font-semibold px-5 lg:px-8 py-1 rounded-lg shadow-lg h-8 hover:bg-purple-500 transition mt-4">
                 Go to Article

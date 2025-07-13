@@ -9,7 +9,7 @@ import { GlobalContext } from "../../contexts/GlobalContext";
 const Form = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { fetchProjects, fetchArticles, data, setData, fetchProjectImage } = useContext(GlobalContext);
+  const { fetchProjects, fetchArticles, data, setData } = useContext(GlobalContext);
   const [dataCategory, setDataCategory] = useState([]);
   const [selectedHeroImage, setSelectedHeroImage] = useState(null);
   const [articleImage, setArticleImage] = useState({});
@@ -28,14 +28,12 @@ const Form = () => {
   const [selectedNewImage, setSelectedNewImage] = useState(null);
   const [imageList, setImageList] = useState([]);
   const [saveIndex, setSaveIndex] = useState(null);
-  const [saveIndexToDelete, setSaveIndexToDelete] = useState(null);
 
   const [imageNameList, setImageNameList] = useState([]);
   const [imageFileList, setImageFileList] = useState([]);
   const [indexIter, setIndexIter] = useState(0);
   const [indexProjectImage, setIndexProjectImage] = useState(null);
   const [isProjectImage, setIsProjectImage] = useState(false);
-  const [heroImageActive, setHeroImageActive] = useState(false);
 
 
 
@@ -58,7 +56,6 @@ const Form = () => {
   const handleHeroImage = (imageId) => {
     setHeroImage(imageId);
     setSingleImage(null);
-    setHeroImageActive(true)
     setNewImageModal(false);
   }
 
@@ -80,7 +77,7 @@ const Form = () => {
             redirect_url: project.attributes.redirect_url,
             start_date: project.attributes.start_date,
             finish_date: project.attributes.finish_date,
-            category_id: project.relationships.category.id,
+            category_id: project.attributes.category_id,
           });
           setIdProject(project.id);
         })
@@ -100,7 +97,6 @@ const Form = () => {
       try {
         const res = await axios.get(`https://api.kyuib.my.id/api/v1/projects/${id}/articles`);
         const articles = res.data.data;
-        console.log("articles.length", articles.length);
 
         const articlesWithBody = await Promise.all(
           articles.map(async (article) => {
@@ -122,17 +118,16 @@ const Form = () => {
   }, [id]);
 
   useEffect(() => {
-    const loadProjectImage = async () => {
+    const fetchProjectImage = async () => {
       try {
         const res = await axios.get(`https://api.kyuib.my.id/api/v1/projects/${id}/images`);
         setProjectImage(res.data.data);
       } catch (err) {
         console.log(err);
       }
-    };
-    loadProjectImage();
+    }
+    fetchProjectImage();
   }, [id]);
-
 
   const handleProjectImage = (imageId) => {
     setSelectedImageId(imageId);
@@ -179,22 +174,6 @@ const Form = () => {
         }
       })
     );
-  };
-
-  const handleDeleteProjectImage = (id, projectId) => {
-    const token = Cookies.get("token");
-    setIsProjectImage(false);
-    axios
-      .delete(`https://api.kyuib.my.id/api/v1/projects/${projectId}/images/${id}`, {
-        headers: { Authorization: "Bearer " + token },
-      })
-      .then(() => {
-        fetchProjectImage(projectId);
-        setProjectImage((prevData) => prevData.filter((image) => image.id !== id));
-      })
-      .catch((err) => {
-        console.error("Delete error:", err?.response?.data || err.message);
-      });
   };
 
 
@@ -267,29 +246,32 @@ const Form = () => {
         );
       }
 
-      for (let index = 0; index < imageFileList.length; index++) {
-        const image = imageFileList[index];
-        const name = imageNameList[index];
+      if (imageFileList.length === imageNameList.length && imageFileList.length > 0 && imageNameList.length > 0) {
+        await Promise.all(
+          imageFileList.map((image, index) => {
+            const newImageForm = new FormData();
+            newImageForm.append("image", image);
+            newImageForm.append("name", imageNameList[index]);
+            newImageForm.append("alternative_text", image.name);
 
-        const newImageForm = new FormData();
-        newImageForm.append("image", image);
-        newImageForm.append("name", name);
-        newImageForm.append("alternative_text", image.name);
-        newImageForm.append("project_id", isEditProject ? idProject : projectIdToUse);
-        // newImageForm.append("order", index); 
+            const projectId = isEditProject ? idProject : projectIdToUse;
+            newImageForm.append("project_id", projectId);
 
-        await axios.post(
-          `https://api.kyuib.my.id/api/v1/projects/${isEditProject ? idProject : projectIdToUse}/images`,
-          newImageForm,
-          config
+            console.log("FormData isi:");
+            for (let pair of newImageForm.entries()) {
+              console.log(`${pair[0]}:`, pair[1]);
+            }
+
+            return axios.post(
+              `https://api.kyuib.my.id/api/v1/projects/${projectId}/images`, newImageForm, config);
+          })
         );
       }
 
 
-
-      // for (let [key, value] of formToSend.entries()) {
-      //   console.log(`${key}:`, value);
-      // }
+      for (let [key, value] of formToSend.entries()) {
+        console.log(`${key}:`, value);
+      }
 
       fetchProjects();
       navigate("/dashboard/projects");
@@ -339,26 +321,6 @@ const Form = () => {
     setNewArticle((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
-  const handleRemoveImageFile = (indexToRemove) => {
-    console.log("indexToRemove", indexToRemove);
-    setImageFileList((prev) => prev.filter((_, index) => index !== indexToRemove));
-    setImageNameList((prev) => prev.filter((_, index) => index !== indexToRemove));
-    setSaveIndexToDelete(indexToRemove);
-    setNewImageModal(false);
-    if (indexToRemove > 0) {
-      setSaveIndex(indexToRemove - 1)
-    }
-
-    if (!isEditProject) {
-      setHeroImageActive(true);
-    }
-    // else{
-    //   setSaveIndex(null)
-    // }
-    setIndexIter((prev) => prev - 1);
-  };
-
-
   const tryAppendImage = (newData) => {
     if (newData.url) {
       if (!isProjectImage) {
@@ -386,11 +348,8 @@ const Form = () => {
   const handleNewImage = () => {
     setFormDataImage({ url: '' });
     setNewImageModal(true);
-    setSaveIndex(null);
     setSingleImage(null);
     setHeroImage(null);
-    setHeroImageActive(false);
-    setFormDataImage({ name: "", url: "" });
 
     const currentIndex = indexIter;
 
@@ -424,21 +383,11 @@ const Form = () => {
   };
 
   const handleProjectImageEdit = (value) => {
-    setProjectImage(prev => {
-      const updated = [...prev];
-      updated[indexProjectImage] = {
-        ...updated[indexProjectImage],
-        attributes: {
-          ...updated[indexProjectImage].attributes,
-          url: value,
-        }
-      };
-      return updated;
-    });
-  };
+    projectImage[indexProjectImage].attributes.url = value;
+  }
 
   const handleImageNameEdit = (field, value) => {
-    const index = saveIndex ?? indexIter - 1;
+    const index = saveIndex ?? 0;
     const isEditing = index != null;
     if (isEditing && field === 'url') {
       setImageFileList((prev) => {
@@ -534,108 +483,84 @@ const Form = () => {
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="border border-gray-300 rounded-xl px-8 py-4">
-              <div className="">
+              <div className="pb-2 ">
                 <label className="relative cursor-pointer block w-full group">
-                  {heroImageActive ? (
-                    <div>
-                      <div>heroImageActive</div>
-                      <img src={URL.createObjectURL(selectedHeroImage) ?? formData.hero_image_url} alt="Current Hero" className="w-full max-h-80 object-cover rounded-xl mb-2" />
-                    </div>
-                  ) : isProjectImage ? (
-                    <div>
-                      <div>isProjectImage</div>
-                      <img src={projectImage[indexProjectImage].attributes?.url instanceof File ? URL.createObjectURL(projectImage[indexProjectImage].attributes?.url) : projectImage[indexProjectImage].attributes?.url} alt={projectImage[indexProjectImage].attributes?.name} className="w-full max-h-80 object-cover rounded-xl mb-2" />
-                    </div>
+                  {selectedHeroImage || selectedNewImage ? (
+                    <img src={URL.createObjectURL(selectedHeroImage)} alt="Preview Hero" className="w-full max-h-80 object-cover rounded-xl mb-2" />
+                  ) : singleImage ? (
+                    <img src={singleImage?.attributes?.url || singleImage?.url} alt="Single Image" className="w-full max-h-80 object-cover rounded-xl mb-2" />
                   ) : imageFileList[saveIndex] ? (
                     <div>
-                      <div>imageFileList[saveIndex]</div>
                       <img src={imageFileList[saveIndex] instanceof File ? URL.createObjectURL(imageFileList[saveIndex]) : imageFileList[saveIndex]}
                         alt={imageNameList[saveIndex] || "Image Preview"}
                         className="w-full max-h-80 object-cover rounded-xl mb-2" />
                     </div>
                   ) : imageFileList[indexIter - 1] ? (
                     <div>
-                      <div>imageFileList[indexIter - 1]</div>
                       <img src={imageFileList[indexIter - 1] instanceof File ? URL.createObjectURL(imageFileList[indexIter - 1]) : imageFileList[indexIter - 1]}
                         alt={imageNameList[indexIter - 1] || "Image Preview"}
                         className="w-full max-h-80 object-cover rounded-xl mb-2" />
                     </div>
-                  ) : newImageModal ? (
-                    <div>
-                      <div>newImageModal</div>
-                      <label htmlFor="heroImage" className="w-full h-52 bg-gray-100 flex items-center justify-center rounded-xl mb-2 text-gray-500 text-sm p-2 cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                        </svg>
-                        <span className="ml-2">Add New Image</span>
-                      </label>
-                      <input type="file" accept="image/*" id="heroImage" className="hidden" onChange={e => e.target.files[0] && (handleImageInputChange('url', e.target.files[0]))} />
-                    </div>
-                  ) : formData.hero_image_url ? (
-                    <div>
-                      <div>formData.hero_image_url</div>
+                  )
+                    : newImageModal ? (
+                      <div>
+                        <label htmlFor="heroImage" className="w-full h-52 bg-gray-100 flex items-center justify-center rounded-xl mb-2 text-gray-500 text-sm p-2 cursor-pointer">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                          </svg>
+                          <span className="ml-2">Add New Image</span>
+                        </label>
+                        <input type="file" accept="image/*" id="heroImage" className="hidden" onChange={e => e.target.files[0] && (handleImageInputChange('url', e.target.files[0]))} />
+                      </div>
+                    ) : formData.hero_image_url ? (
                       <img src={formData.hero_image_url} alt="Current Hero" className="w-full max-h-80 object-cover rounded-xl mb-2" />
-                    </div>
-                  ) : (
-                    <div className="w-full h-52 bg-gray-100 flex items-center justify-center rounded-xl mb-2 text-gray-500 text-sm p-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                      </svg>
-                    </div>
-                  )}
-                  {!isProjectImage ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-sm font-semibold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      Update Image
-                    </div>
-                  ) : null
-                  }
+                    )
+                      : (
+                        <div className="w-full h-52 bg-gray-100 flex items-center justify-center rounded-xl mb-2 text-gray-500 text-sm p-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                          </svg>
+                        </div>
+                      )}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-sm font-semibold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Update Image
+                  </div>
 
-                  {isProjectImage ? (
+                  {imageFileList[indexIter - 1] && !saveIndex ? (
                     <div>
-                      <div>isProjectImage</div>
-                      <input type="file" accept="image/*" id="heroImage" className="hidden" onChange={(e) => handleProjectImageEdit(e.target.files[0])} />
-                    </div>
-                  ) : imageFileList[indexIter - 1] && saveIndex == null ? (
-                    <div>
-                      <div>imageFileList[indexIter - 1] && !saveIndex</div>
                       <input type="file" accept="image/*" onChange={(e) => handleImageNameEdit('url', e.target.files[0])} className="hidden" />
                     </div>
                   ) : imageFileList[indexIter - 1] || imageFileList[saveIndex] ? (
                     <div>
-                      <div>imageFileList[indexIter - 1] || imageFileList[saveIndex]</div>
                       <input type="file" accept="image/*" onChange={(e) => handleImageNameEdit('url', e.target.files[0])} className="hidden" />
                     </div>
                   ) : newImageModal ? (
                     <div>
-                      <div>newImageModal</div>
                       <input type="file" accept="image/*" id="heroImage" className="hidden" onChange={e => e.target.files[0] && (handleImageInputChange('url', e.target.files[0]), tryAppendImage({ url: e.target.files[0] }))} />
+                    </div>
+                  ) : isProjectImage ? (
+                    <div>
+                      <input type="file" accept="image/*" id="heroImage" className="hidden" onChange={(e) => handleProjectImageEdit(e.target.files[0])} />
                     </div>
                   )
                     : (
-                      <div>
-                        <input type="file" accept="image/*" onChange={(e) => { setSelectedHeroImage(e.target.files[0]); setHeroImageActive(true) }} className="hidden" />
-                      </div>
+                      <input type="file" accept="image/*" onChange={(e) => setSelectedHeroImage(e.target.files[0])} className="hidden" />
                     )}
 
                   {/* ===========================================================================================   INIIIIIIIIIIIIIIIIIII */}
                 </label>
-                {heroImageActive ? (
-                  null
-                ) : saveIndex != null ? (
+                {saveIndex != null ? (
                   <div className="my-3">
-                    <div>saveIndex != null</div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">Image Name</label>
                     <input value={imageNameList[saveIndex] || ""} onChange={e => handleImageNameEdit('name', e.target.value)} placeholder="Input" type="text" className="border border-gray-300 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                   </div>
                 ) : newImageModal ? (
                   <div className="my-3">
-                    <div>newImageModal</div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">Image Name</label>
                     <input value={formDataImage.name} onChange={e => handleImageInputChange('name', e.target.value)} onBlur={saveImageNameToList} placeholder='Input' type="text" className="border border-gray-300 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
                   </div>
                 ) : isProjectImage ? (
                   <div className="my-3">
-                    <div>isProjectImage</div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 ml-2">Image Name</label>
                     <input value={projectImage[indexProjectImage].attributes.name} onChange={e => handleImageInputChange('name', e.target.value)} onBlur={saveImageNameToList} placeholder='Input' type="text" className="border border-gray-300 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
                   </div>
@@ -653,13 +578,10 @@ const Form = () => {
                       {selectedHeroImage ? (
                         <img src={URL.createObjectURL(selectedHeroImage)} alt="Preview Hero" className="w-16 h-16 object-cover rounded-xl mr-2" />
                       ) : formData.hero_image_url ? (
-                        <div>
-                          {/* <div>formData.hero_image_url</div> */}
-                          <button type="button" className="h-fit rounded-2xl flex justify-center items-center mb-2 hover:border-2 active:border-2 border-transparent hover:border-purple-300 mt-2 mr-2"
-                            onClick={() => handleHeroImage(formData.id)}>
-                            <img src={formData.hero_image_url} alt="Current Hero" className="w-16 h-16 object-cover rounded-xl" />
-                          </button>
-                        </div>
+                        <button type="button" className="h-fit rounded-2xl flex justify-center items-center mb-2 hover:border-2 active:border-2 border-transparent hover:border-purple-300 active:border-blue-300"
+                          onClick={() => handleHeroImage(formData.id)}>
+                          <img src={formData.hero_image_url} alt="Current Hero" className="w-16 h-16 object-cover rounded-xl" />
+                        </button>
                       ) : (
                         <div className="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-xl mb-2 text-gray-500 text-sm p-2">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -670,75 +592,44 @@ const Form = () => {
 
 
                       {projectImage.map((image, index) => (
-                        <div key={image.id} className="flex items-center mb-2 relative ">
-                          <button type="button" onClick={() => {
-                            setNewImageModal(false);
-                            handleProjectImage(String(image.id));
-                            setIndexProjectImage(index);
-                            setIsProjectImage(true);
-                            setHeroImageActive(false);
-                          }} className="h-fit w-fit rounded-2xl justify-center items-center flex-shrink-0 relative inline-block hover:border-2 active:border-2 border-transparent hover:border-purple-300 mt-2 mr-2">
-                            <img src={image.attributes?.url} alt={image.attributes.name} className="w-16 h-16 object-cover rounded-xl" />
-                          </button>
-
-
-                          <button type="button" onClick={() => { handleDeleteProjectImage(image.id, idProject) }} className="absolute top-0 right-0 w-5 h-5 bg-red-400 flex items-center justify-center rounded-full text-white text-xs pb-1">
-                            x
-                          </button>
-                        </div>
-                      ))}
-                      {console.log("projectImage", projectImage[projectImage.length - 1])}
-
-
-                      {imageFileList.map((img, index) => img instanceof File ? (
-                        <div className="flex items-center relative ">
-                          <button key={index} onClick={() => { setSaveIndex(index); setIsProjectImage(false); }} type="button" className="rounded-2xl hover:border-2 active:border-2 border-transparent hover:border-purple-300 mr-2">
-                            <img src={URL.createObjectURL(img)} alt={img.name} className="w-16 h-16 object-cover rounded-xl" />
-                          </button>
-
-                          <button type="button" onClick={() => { handleRemoveImageFile(index) }} className="absolute top-0 right-0 w-5 h-5 bg-red-400 flex items-center justify-center rounded-full text-white text-xs pb-1">
-                            x
-                          </button>
-                        </div>
-                      ) : (
-
-                        <div className="flex items-center relative ">
-                          <button key={index} onClick={() => { setSaveIndex(index); setIsProjectImage(false); setNewImageModal(true) }} type="button" className="rounded-2xl hover:border-2 active:border-2 border-transparent hover:border-purple-300 ">
-                            <div className="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-xl  text-gray-500 text-sm">
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                              </svg>
-                            </div>
-
-                          </button>
-
-                          <button type="button" onClick={() => { handleRemoveImageFile(index) }} className="absolute top-0 right-0 w-5 h-5 bg-red-400 flex items-center justify-center rounded-full text-white text-xs pb-1">
-                            x
+                        <div key={image.id} className="flex items-center mb-2">
+                          <button type="button" key={image.id} onClick={() => handleProjectImage(String(image.id), setIndexProjectImage(index), setIsProjectImage(true))} className="h-fit w-fit rounded-2xl justify-center items-center  flex-shrink-0 relative inline-block hover:border-2 active:border-2 border-transparent hover:border-purple-300 active:border-blue-300 ">
+                            <img src={image.attributes.url} alt={image.attributes.name} className="w-16 h-16 object-cover rounded-xl " />
                           </button>
                         </div>
                       ))}
 
-
-
-                      {console.log("indexIter: ", indexIter)}
-                      {/* {console.log("saveIndex: ", saveIndex)} */}
-                      {/* {console.log("imageNameList: ", imageNameList)} */}
                       {/* {console.log("projectImage", projectImage)} */}
-                      {/* {console.log("imageFileList: ", imageFileList)} */}
+                      {imageFileList.map((img, index) => (
+                        <button onClick={() => setSaveIndex((index), setIsProjectImage(false))} type="button" key={index} className="mb-2">
+                          {img instanceof File ? (
+                            <img src={URL.createObjectURL(img)} alt={imageNameList[index]} className="w-16 h-16 object-cover rounded-xl" />
+                          ) : (<div className="w-16 h-16 bg-gray-100 flex items-center justify-center rounded-xl mb-2 text-gray-500 text-sm p-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                            </svg>
+                          </div>
+                          )}
+                        </button>
+                      ))}
 
+
+
+                      {/* {console.log("indexIter: ", indexIter)}
+                      {console.log("saveIndex: ", saveIndex)}
+                      {console.log("imageNameList: ", imageNameList)}
+                      {console.log("imageFileList: ", imageFileList)} */}
 
                     </div>
                   </div>
 
                   <div className="">
-                    <button type="button" onClick={() => { handleNewImage(); setIndexProjectImage(null), setIsProjectImage(false); setHeroImageActive(false); }} className="bg-gray-200 hover:bg-gray-300 w-16 h-16 flex justify-center items-center p-4 rounded-xl">
+                    <button type="button" onClick={() => { handleNewImage(); setSaveIndex(null); setIndexProjectImage(null) }} className="bg-gray-200 hover:bg-gray-300 w-16 h-16 flex justify-center items-center p-4 rounded-xl">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
                         <path fillRule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clipRule="evenodd" />
                       </svg>
                     </button>
                   </div>
-                  {/* {console.log("isProjectImage", isProjectImage)} */}
-
                 </div>
               </div>
 

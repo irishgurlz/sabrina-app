@@ -13,13 +13,13 @@ export const GlobalProvider = ({ children }) => {
     let sisa = split[0].length % 3;
     let rupiah = split[0].substr(0, sisa);
     const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-  
+
     if (ribuan) {
       const separator = sisa ? "." : "";
       rupiah += separator + ribuan.join(".");
-      
+
     }
-  
+
     rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
     return rupiah;
   };
@@ -88,6 +88,20 @@ export const GlobalProvider = ({ children }) => {
       });
   };
 
+  const fetchFeaturedProjects = () => {
+    setLoading(true);
+    axios
+      .get("https://api.kyuib.my.id/api/v1/landing-pages/1/featured-projects")
+      .then((res) => {
+        setData(res.data.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  };
+
   const fetchCategories = () => {
     setLoading(true);
     axios
@@ -116,6 +130,22 @@ export const GlobalProvider = ({ children }) => {
       });
   };
 
+
+  const fetchProjectImage = (projectId) => {
+    setLoading(true);
+    axios
+      .get(`https://api.kyuib.my.id/api/v1/projects/${projectId}/images`)
+      .then((res) => {
+        setData(res.data.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  };
+
+
   useEffect(() => {
     fetchProjects();
     axios
@@ -143,8 +173,10 @@ export const GlobalProvider = ({ children }) => {
         loading,
         fetchProjects,
         fetchArticles,
+        fetchProjectImage,
         formatRupiah,
         fetchCategories,
+        fetchFeaturedProjects,
       }}
     >
       {children}

@@ -63,7 +63,7 @@ const Navbar = () => {
             <span className="hidden md:block">Dashboard</span>
           </NavLink>
 
-          <NavLink to="/category" end className={({ isActive }) => `transition flex items-center gap-4 rounded-lg px-5 py-2 text-sm ${isActive ? "bg-blue-400 text-white" : "hover:bg-blue-300 hover:text-white"}`}>
+          <NavLink to="/dashboard/category" end className={({ isActive }) => `transition flex items-center gap-4 rounded-lg px-5 py-2 text-sm ${isActive ? "bg-blue-400 text-white" : "hover:bg-blue-300 hover:text-white"}`}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
             </svg>
@@ -85,7 +85,7 @@ const Navbar = () => {
           </NavLink>
 
 
-          <NavLink to="/landing" end className={({ isActive }) => `transition flex items-center gap-4 rounded-lg px-5 py-2 text-sm ${isActive ? "bg-blue-400 text-white" : "hover:bg-blue-300 hover:text-white"}`}>
+          <NavLink to="/dashboard/landing" end className={({ isActive }) => `transition flex items-center gap-4 rounded-lg px-5 py-2 text-sm ${isActive ? "bg-blue-400 text-white" : "hover:bg-blue-300 hover:text-white"}`}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
             </svg>
