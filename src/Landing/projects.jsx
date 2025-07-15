@@ -128,28 +128,11 @@ const Beranda = () => {
         <div className="w-full py-6">
           <div className="relative">
             <input className="w-full bg-white placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-3xl pl-3 pr-28 py-4 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-lg focus:shadow"
-              placeholder="Search Here..."
-              onChange={(e) => handleChange("title", e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSearch();
-              }}
-            />
-            <button
-              className="absolute mt-1 top-1 right-1 flex items-center rounded-3xl bg-slate-800 py-2 px-8 border border-transparent text-sm text-white shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 mr-1"
-              type="button"
-              onClick={handleSearch}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4 mr-2"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
-                  clipRule="evenodd"
-                />
+              placeholder="Search Here..." onChange={(e) => handleChange("title", e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}/>
+            <button className="absolute mt-1 top-1 right-1 flex items-center rounded-3xl bg-slate-800 py-2 px-8 border border-transparent text-sm text-white shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 mr-1"
+              type="button" onClick={handleSearch} >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24" >
+                <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clipRule="evenodd" />
               </svg>
               Search
             </button>
@@ -161,11 +144,7 @@ const Beranda = () => {
           <div className="flex gap-4 w-max">
             {Array.isArray(dataCategory) &&
               dataCategory.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => fetchProjectsByCategory(category)}
-                  className="rounded-xl px-4 py-2 bg-orange-300 hover:bg-orange-400 active:bg-orange-500 flex-shrink-0"
-                >
+                <button key={category.id} onClick={() => fetchProjectsByCategory(category)} className="rounded-xl px-4 py-2 bg-orange-300 hover:bg-orange-400 active:bg-orange-500 flex-shrink-0" >
                   {category.attributes.name}
                 </button>
               ))}
@@ -176,22 +155,13 @@ const Beranda = () => {
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 pt-6 pb-12 w-full">
           {!projectCategoryVisible &&
             (loading ? (
-              <div className="col-span-full flex justify-center items-center">
-                <img
-                  src="https://cdn.pixabay.com/animation/2022/07/29/03/42/03-42-05-37_512.gif"
-                  className="w-[60px] h-[60px]"
-                  alt="Loading..."
-                />
+              <div className="col-span-full flex justify-center items-center"> 
+                <img src="https://cdn.pixabay.com/animation/2022/07/29/03/42/03-42-05-37_512.gif" className="w-[60px] h-[60px]" alt="Loading..." />
               </div>
             ) : (
               dataProject.map((project) => (
-                <div
-                  key={project.id}
-                  className="shadow-lg bg-cover bg-center min-h-[15rem] w-full rounded-xl overflow-hidden flex flex-col justify-end relative"
-                  style={{
-                    backgroundImage: `url(${project.attributes.hero_image_url})`,
-                  }}
-                >
+                <div key={project.id} className="shadow-lg bg-cover bg-center min-h-[15rem] w-full rounded-xl overflow-hidden flex flex-col justify-end relative"
+                  style={{ backgroundImage: `url(${project.attributes.hero_image_url})`, }}>
                   <div className="p-3 bg-purple-300 min-h-[5rem] w-full">
                     <div className="bg-white shadow-xl p-3 rounded-lg grid grid-cols-6">
                       <div className="col-span-5">
@@ -200,31 +170,17 @@ const Beranda = () => {
                         </h2>
                         <p className="text-sm">
                           {" "}
-                          {/* {project.attributes.description
+                          {project.attributes.description
                             .split(" ")
                             .slice(0, 3)
-                            .join(" ") ?? ""} */}
+                            .join(" ") ?? ""}
                           ...
                         </p>
                       </div>
                       <div className="col-span-1 flex justify-end">
-                        <button
-                          onClick={() => handleDetail(project.id)}
-                          className="bg-pink-400 hover:bg-pink-500 shadow-xl rounded-2xl h-[3rem] w-[3rem] flex items-center justify-center"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-6 h-6 text-white"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"
-                            />
+                        <button onClick={() => handleDetail(project.attributes.slug)} className="bg-pink-400 hover:bg-pink-500 shadow-xl rounded-2xl h-[3rem] w-[3rem] flex items-center justify-center" >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
                           </svg>
                         </button>
                       </div>
@@ -236,13 +192,8 @@ const Beranda = () => {
 
           {projectCategoryVisible &&
             filteredProjects.map((projectCategory) => (
-              <div
-                key={projectCategory.id}
-                className="shadow-lg bg-cover bg-center min-h-[15rem] w-full rounded-xl overflow-hidden flex flex-col justify-end relative"
-                style={{
-                  backgroundImage: `url(${projectCategory.attributes.hero_image_url})`,
-                }}
-              >
+              <div key={projectCategory.id} className="shadow-lg bg-cover bg-center min-h-[15rem] w-full rounded-xl overflow-hidden flex flex-col justify-end relative"
+                style={{ backgroundImage: `url(${projectCategory.attributes.hero_image_url})`, }} >
                 <div className="p-3 bg-purple-300 min-h-[5rem] w-full">
                   <div className="bg-white shadow-xl p-3 rounded-lg grid grid-cols-6">
                     <div className="col-span-5">
@@ -258,23 +209,9 @@ const Beranda = () => {
                       </p>
                     </div>
                     <div className="col-span-1 flex justify-end">
-                      <button
-                        onClick={() => handleDetail(projectCategory.id)}
-                        className="bg-pink-400 hover:bg-pink-500 shadow-xl rounded-2xl h-[3rem] w-[3rem] flex items-center justify-center"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6 text-white"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"
-                          />
+                      <button onClick={() => handleDetail(projectCategory.id)} className="bg-pink-400 hover:bg-pink-500 shadow-xl rounded-2xl h-[3rem] w-[3rem] flex items-center justify-center" >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white" >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
                         </svg>
                       </button>
                     </div>

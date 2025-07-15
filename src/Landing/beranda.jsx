@@ -118,12 +118,8 @@ const Beranda = () => {
       <div className="">
         <div className="w-full">
           {/* ======== CARD ATAS =========== */}
-          <div
-            className="hero min-h-[20rem] md:min-h-[30rem] bg-cover bg-center bg-no-repeat shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-1 xl:grid-cols-3 mt-4 pt-5 shadow-xl"
-            style={{
-              backgroundImage: `url(${dataUser?.attributes?.hero_image_url})`,
-            }}
-          >
+          <div className="hero min-h-[20rem] md:min-h-[30rem] bg-cover bg-center bg-no-repeat shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-1 xl:grid-cols-3 mt-4 pt-5 shadow-xl"
+            style={{ backgroundImage: `url(${dataUser?.attributes?.hero_image_url})`, }} >
             <div className="flex flex-col justify-end mt-16 px-6 md:pl-16 text-center md:text-left">
               <h1 className="hidden md:block text-3xl font-bold text-white">
                 {dataUser?.attributes?.display_name}
@@ -178,10 +174,7 @@ const Beranda = () => {
             </div>
           </div>
           <div className="flex items-center justify-center">
-            <button
-              onClick={() => handleMoreProject()}
-              className="transition bg-pink-400 hover:bg-pink-500 active:bg-pink-400 p-5 shadow-xl rounded-xl h-[3rem] w-auto flex items-center justify-center text-white"
-            >
+            <button onClick={() => handleMoreProject()} className="transition bg-pink-400 hover:bg-pink-500 active:bg-pink-400 p-5 shadow-xl rounded-xl h-[3rem] w-auto flex items-center justify-center text-white" >
               More Projects
             </button>
           </div>

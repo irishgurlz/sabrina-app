@@ -147,7 +147,7 @@ const Table = () => {
 
   const handleDetail = (project) => {
     if (project) {
-      navigate(`/dashboard/projects/${project.attributes.slug}`);
+      navigate(`/dashboard/projects/${project}`);
     }
     setModalForm(false);
   };
@@ -232,7 +232,7 @@ const Table = () => {
               <div className="bg-white w-full max-w-sm sm:max-w-md md:max-w-3xl p-2 lg:p-4 lg:max-w-2xl rounded-2xl shadow-2xl space-y-4 overflow-y-auto max-h-screen relative text-sm text-black">
                 <div className="">
                   {console.log("form", formData)}
-                  <button onClick={() => handleDetail(formData)} className="bg-blue-400 hover:bg-blue-500 shadow-xl rounded-2xl h-[3rem] w-[3rem] flex items-center justify-center mb-2">
+                  <button onClick={() => handleDetail(selectedProject?.attributes?.slug)} className="bg-blue-400 hover:bg-blue-500 shadow-xl rounded-2xl h-[3rem] w-[3rem] flex items-center justify-center mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
                     </svg>
