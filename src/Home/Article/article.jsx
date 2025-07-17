@@ -166,12 +166,12 @@ const Table = () => {
           <button onClick={handleAddArticle} className="w-full lg:w-1/3 md:w-auto mt-5 lg:mt-0 bg-blue-500 text-white rounded-xl px-4 py-2 hover:bg-blue-400">Add Article</button>
         </div>
 
-        <div className="w-full bg-white rounded-xl overflow-hidden">
+        <div className="w-full bg-white overflow-hidden">
           <div className="overflow-x-auto grid grid-cols-2 md:grid-cols-3 gap-4">
             {console.log("currentArticle", data)}
             {filteredArticles.map((Article) => (
               <div key={Article.id} className="shadow-lg bg-cover bg-center min-h-[20rem] w-full rounded-xl overflow-hidden flex flex-col justify-end relative" style={{ backgroundImage: `url(${Article.attributes.hero_image_url})`, }}>
-                <div className="p-3 bg-purple-300 min-h-[5rem] w-full">
+                <div className="p-3 backdrop-blur-sm bg-white/80 transition min-h-[5rem] w-full">
                   <div className="bg-white shadow-xl p-3 rounded-lg grid grid-cols-7">
 
                     <div className="col-span-6">

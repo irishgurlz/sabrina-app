@@ -83,6 +83,10 @@ const Beranda = () => {
     navigate(`/projects`);
   };
 
+  const handleMoreArticles = () => {
+    navigate(`/articles`);
+  };
+
   const handleProjectCategory = (categoryId) => {
     setSelectedCategoryId(categoryId);
     setProjectCategoryVisible(true);
@@ -95,27 +99,10 @@ const Beranda = () => {
     );
   }, [dataProject, selectedCategoryId]);
 
-  const baseColors = [
-    "bg-blue-300",
-    "bg-red-300",
-    "bg-pink-300",
-    "bg-green-300",
-    "bg-yellow-300",
-    "bg-orange-300",
-  ];
-
-  const hoverColors = [
-    "hover:bg-blue-400",
-    "hover:bg-red-400",
-    "hover:bg-pink-400",
-    "hover:bg-green-400",
-    "hover:bg-yellow-400",
-    "hover:bg-orange-400",
-  ];
 
   return (
     <section className="bg-white">
-      <div className="">
+      <div className="mb-12">
         <div className="w-full">
           {/* ======== CARD ATAS =========== */}
           <div className="hero min-h-[20rem] md:min-h-[30rem] bg-cover bg-center bg-no-repeat shadow-lg overflow-hidden grid grid-cols-1 md:grid-cols-1 xl:grid-cols-3 mt-4 pt-5 shadow-xl"
@@ -159,22 +146,22 @@ const Beranda = () => {
             <div className="slide-2 overflow-x-auto md:py-5 scrollbar-hide">
               <div className="flex gap-4 w-max">
                 {projectLoading
-                  ? Array.from({ length: 4 }).map((_, index) => (
-                      <ProjectCard skeleton={true} key={index} />
-                    ))
+                  ? Array.from({ length: 5 }).map((_, index) => (
+                    <ProjectCard skeleton={true} key={index} />
+                  ))
                   : Array.isArray(dataProject) &&
-                    dataProject.map((project) => (
-                      <ProjectCard
-                        project={project}
-                        skeleton={false}
-                        key={project.id}
-                      />
-                    ))}
+                  dataProject.map((project) => (
+                    <ProjectCard
+                      project={project}
+                      skeleton={false}
+                      key={project.id}
+                    />
+                  ))}
               </div>
             </div>
           </div>
           <div className="flex items-center justify-center">
-            <button onClick={() => handleMoreProject()} className="transition bg-pink-400 hover:bg-pink-500 active:bg-pink-400 p-5 shadow-xl rounded-xl h-[3rem] w-auto flex items-center justify-center text-white" >
+            <button onClick={() => handleMoreProject()} className="transition bg-black hover:bg-gray-700 active:bg-gray-600 p-4 shadow-xl rounded-2xl h-[3rem] w-auto flex items-center justify-center text-white" >
               More Projects
             </button>
           </div>
@@ -187,18 +174,20 @@ const Beranda = () => {
             </h2>
             <div className="flex gap-4 w-max">
               {articleLoading
-                ? Array.from({ length: 4 }).map((_, index) => (
-                    <ArticleCard skeleton={true} key={index} />
-                  ))
+                ? Array.from({ length: 5 }).map((_, index) => (
+                  <ArticleCard skeleton={true} key={index} />
+                ))
                 : Array.isArray(dataArticle) &&
-                  dataArticle.map((article) => (
-                    <ArticleCard
-                      article={article}
-                      skeleton={false}
-                      key={article.id}
-                    />
-                  ))}
+                dataArticle.map((article) => (
+                  <ArticleCard article={article} skeleton={false} key={article.id} />
+                ))}
             </div>
+          </div>
+
+          <div className="flex items-center justify-center">
+            <button onClick={() => handleMoreArticles()} className="transition bg-black hover:bg-gray-700 active:bg-gray-600 p-4 shadow-xl rounded-2xl h-[3rem] w-auto flex items-center justify-center text-white" >
+              More Articles
+            </button>
           </div>
         </div>
       </div>

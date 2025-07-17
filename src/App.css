@@ -72,3 +72,24 @@
 .animate-fadeSlideUp {
   animation: fadeSlideUp 0.8s ease forwards;
 }
+
+/* app.css */
+.react-select-container {
+  font-size: 0.875rem; /* text-sm */
+}
+
+.react-select__control {
+  border-radius: 0.75rem; /* rounded-xl */
+  border: 1px solid #cbd5e1; /* slate-300 */
+  padding: 0.25rem 0.5rem; /* pt-1 pb-1 px-2 */
+  box-shadow: none;
+}
+
+.react-select__control:hover {
+  border-color: #94a3b8; /* slate-400 */
+}
+
+.react-select__menu {
+  border-radius: 0.75rem;
+}
+

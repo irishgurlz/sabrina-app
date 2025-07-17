@@ -78,8 +78,6 @@ const Beranda = () => {
     setProjectImageVisible(true);
   };
 
-
-
   const handleResetImage = () => {
     setProjectImageVisible(false);
     setSingleImage(null);
@@ -90,37 +88,55 @@ const Beranda = () => {
     navigate(`/projects/${project}/articles`);
   };
 
+  const handleDetailArticle = (article) => {
+    navigate(`/articles/${article.attributes.slug}`);
+  };
+
   return (
     <section>
       <div className="mx-5 md:mx-12 mb-12 mt-24 pb-2 ">
         <div className="">
 
           <div className="md:col-span-2 animate-fadeSlideLeft">
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-              <div className="mb-4">
-                <span className="inline-block bg-orange-200 text-orange-800 text-xs font-semibold px-4 py-1 rounded-full shadow">
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 space-y-5">
+
+              {/* Kategori */}
+              <div>
+                <span className="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-4 py-1 rounded-full shadow-sm">
                   {projectDetail?.relationships?.category?.name}
                 </span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">{projectDetail?.attributes?.title}</h1>
-              <div className="flex items-center gap-2 text-sm text-gray-600 mt-5">
-                <span className="font-medium ">Waktu Pengerjaan :</span>
-                <span className="text-sm text-gray-600 font-medium ">
-                  {projectDetail?.attributes?.start_date && (() => {
+
+              {/* Judul */}
+              <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-snug">
+                {projectDetail?.attributes?.title}
+              </h1>
+
+              {/* Info: Tanggal + Link */}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-700 ">
+                <div className="flex items-center gap-2 ">
+                  <div>
+                    {projectDetail?.attributes?.redirect_url && (
+                      <Link to={projectDetail.attributes.redirect_url} className="ml-auto bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs px-4 py-1 rounded-2xl hover:bg-purple-500 transition">
+                        Redirect Link
+                      </Link>)}
+                  </div>
+                  <span className="font-semibold">Waktu Pengerjaan:</span>
+                  <span> {projectDetail?.attributes?.start_date && (() => {
                     const [day, month, year] = projectDetail.attributes.start_date.split("-");
                     const startDate = new Date(`${year}-${month}-${day}`);
-                    const formattedStart = startDate.toLocaleDateString("en-GB", {
+                    const formattedStart = startDate.toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "long",
                       year: "numeric",
                     });
 
                     const finishRaw = projectDetail.attributes.finish_date?.trim();
-                    let formattedFinish = "Now";
+                    let formattedFinish = "Sekarang";
                     if (finishRaw) {
                       const [fDay, fMonth, fYear] = finishRaw.split("-");
                       const finishDate = new Date(`${fYear}-${fMonth}-${fDay}`);
-                      formattedFinish = finishDate.toLocaleDateString("en-GB", {
+                      formattedFinish = finishDate.toLocaleDateString("id-ID", {
                         day: "numeric",
                         month: "long",
                         year: "numeric",
@@ -129,12 +145,18 @@ const Beranda = () => {
 
                     return `${formattedStart} - ${formattedFinish}`;
                   })()}
-                </span>
+                  </span>
+                </div>
 
               </div>
-              <p className="text-gray-700 text-base leading-relaxed">{projectDetail?.attributes?.description}</p>
+
+              {/* Deskripsi */}
+              <p className="text-gray-700 text-base leading-relaxed whitespace-pre-line">
+                {projectDetail?.attributes?.description}
+              </p>
             </div>
           </div>
+
 
         </div>
         <div className="mt-6 grid grid-cols-1 md:grid-cols-7 gap-6 items-stretch pb-2">
@@ -185,12 +207,12 @@ const Beranda = () => {
                     <img src={article.attributes.hero_image_url} alt="Article" className="w-[7rem] h-[5rem] object-cover rounded-lg border border-gray-200 shadow-sm" />
 
                     <div className="flex-1">
-                      <h2 className="text-base font-semibold text-gray-800 leading-snug group-hover:text-purple-500 transition">
+                      <h2 className="text-base font-semibold text-gray-800 leading-snug transition">
                         {article.attributes?.title}
                       </h2>
 
                       <div className="mt-3">
-                        <button onClick={() => handleArticleProject(projectDetail?.attributes?.slug)} className="inline-flex items-center gap-2 bg-purple-400 hover:bg-purple-500 text-white text-sm font-medium px-3 py-1.5 rounded-lg shadow-md transition" >
+                        <button onClick={() => handleDetailArticle(article)} className="inline-flex items-center gap-2 bg-purple-400 hover:bg-purple-500 text-white text-sm font-medium px-3 py-1.5 rounded-lg shadow-md transition" >
                           <span>Read Article</span>
                           <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m17 8l4 4m0 0l-4 4m4-4H3" />

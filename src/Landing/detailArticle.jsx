@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import Cookies from "js-cookie";
-import '../App.css';
+import "../App.css";
 
 const DetailArticle = () => {
   const [ArticleDetail, setArticleDetail] = useState(null);
@@ -12,38 +12,37 @@ const DetailArticle = () => {
   const [selectedImageId, setSelectedImageId] = useState(null);
   const [ArticleImageVisible, setArticleImageVisible] = useState(false);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { id } = useParams();
 
   useEffect(() => {
-    const token = Cookies.get('token');
-    console.log(id)
     if (!id) return;
 
-    axios
-      .get(`https://api.kyuib.my.id/api/v1/articles/${id}`)
-      .then((res) => {
+    const fetchArticle = async () => {
+      try {
+        const res = await axios.get(`https://api.kyuib.my.id/api/v1/articles/${id}`);
         setArticleDetail(res.data.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+      } catch (err) {
+        console.error("Failed to fetch article detail");
+      }
+      setLoading(false);
+    };
 
-    axios
-      .get(`https://api.kyuib.my.id/api/v1/articles/${id}/images`)
-      .then((res) => {
+    const fetchImages = async () => {
+      try {
+        const res = await axios.get(`https://api.kyuib.my.id/api/v1/articles/${id}/images`);
         setArticleImage(res.data.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, [id, navigate]);
+      } catch (err) {
+        console.error("Failed to fetch images");
+      }
+    };
+
+    fetchArticle();
+    fetchImages();
+  }, [id]);
 
   useEffect(() => {
     if (!selectedImageId) return;
-
     setLoading(true);
     axios
       .get(`https://api.kyuib.my.id/api/v1/articles/${id}/images/${selectedImageId}`)
@@ -51,9 +50,7 @@ const DetailArticle = () => {
         setSingleImage(res.data.data);
         setLoading(false);
       })
-      .catch(() => {
-        setLoading(false);
-      });
+      .catch(() => setLoading(false));
   }, [selectedImageId, id]);
 
   const handleArticleImage = (imageId) => {
@@ -61,53 +58,43 @@ const DetailArticle = () => {
     setArticleImageVisible(true);
   };
 
-  const handleResetImage = () => {
-    setArticleImageVisible(false);
-    setSingleImage(null);
-    setSelectedImageId(null);
-  };
 
-  const handleEditPage = (Article) => {
-    navigate(`/dashboard/Articles/${Article}/edit`)
-  };
+  if (loading) return <div className="text-center py-20">Loading...</div>;
 
   return (
-    <section>
-        {/* <h1 className="text-3xl font-bold mt-10 mb-5">{ArticleDetail?.attributes?.title}</h1> */}
-      <div className="mt-16 grid grid-cols-1 gap-4 mx-5 md:mx-12">
-        <div className="md:col-span-4 animate-fadeSlideRight">
-          <div className="hero min-h-[15rem] md:min-h-[25rem] md:min-h-[35rem] bg-cover bg-center bg-no-repeat shadow-lg overflow-hidden rounded-2xl"
-          style={{ backgroundImage: `url(${ ArticleImageVisible ? singleImage?.attributes?.url : ArticleDetail?.attributes?.hero_image_url})`,}}/>
+    <section className="mt-24 mx-5 md:mx-16 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+        <div className="md:col-span-5 relative rounded-2xl overflow-hidden shadow-md">
+          <div className="h-[350px] md:h-[500px] bg-cover bg-center transition-all duration-300" 
+            style={{ backgroundImage: `url(${ ArticleImageVisible ? singleImage?.attributes?.url : ArticleDetail?.attributes?.hero_image_url})`,}}>
+            <div className="w-full h-full bg-gradient-to-t from-black/60 to-transparent" />
+          </div>
+        </div>
 
-          {/* =============== Gallery ===================*/}
+        <div className="md:col-span-5 bg-white rounded-2xl p-8 shadow-lg">
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
+            {ArticleDetail?.attributes?.title}
+          </h1>
+          <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+            {ArticleDetail?.attributes?.body}
+          </p>
+
           
         </div>
-        <div className="md:mx-2 md:col-span-2 animate-fadeSlideLeft mb-24 mt-4">
-          <div className="flex gap-2 justify-start items-center">
-            <button className="bg-purple-400 text-white font-semibold px-5 lg:px-8 py-1 rounded-lg shadow-lg h-8 hover:bg-purple-500 transition mt-4">
-                {ArticleDetail?.relationships?.project?.attributes?.title}
-            </button>
 
-            {/* <Link to={ArticleDetail?.attributes?.redirect_url} className="bg-pink-400 text-white font-semibold px-5 lg:px-8 py-1 rounded-lg shadow-lg h-8 hover:bg-pink-500 transition mt-4">
-                Redirect Link
-            </Link> */}
-
-            <div className="mt-4">
-                <button onClick={() => handleEditPage(ArticleDetail?.attributes?.slug)} className="bg-orange-400 hover:bg-orange-500 shadow-xl rounded-lg h-[2rem] w-[5rem] flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-white">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                </svg>
-                </button>
+        {ArticleImage.length > 0 && (
+          <div className="md:col-span-5 mt-4">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Galeri Gambar</h2>
+            <div className="flex flex-wrap gap-4">
+              {ArticleImage.map((img) => (
+                <img key={img.id} src={img.attributes?.url} alt="Gallery" className="w-32 h-20 object-cover rounded-lg cursor-pointer hover:scale-105 transition" onClick={() => handleArticleImage(img.id)} />
+              ))}
+              {ArticleImageVisible && (
+                <button className="text-sm text-red-600 hover:underline"> Reset Gambar Utama </button>
+              )}
             </div>
           </div>
-          <div className="bg-white rounded-xl p-6 shadow-md">
-            
-            <h1 className="text-3xl font-bold text-gray-800 mb-3">{ArticleDetail?.attributes?.title}</h1>
-            <p className="text-gray-700 text-base leading-relaxed">{ArticleDetail?.attributes?.body}</p>
-            
-          </div>
-
-        </div>
+        )}
       </div>
     </section>
   );

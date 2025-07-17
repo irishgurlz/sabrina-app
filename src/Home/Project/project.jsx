@@ -178,7 +178,7 @@ const Table = () => {
     setModalForm(false);
   };
 
-  
+
   const filteredProjects = data.filter((project) =>
     project.attributes.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -197,23 +197,26 @@ const Table = () => {
           <button onClick={handleAddProject} className="w-full lg:w-1/3 md:w-auto mt-5 lg:mt-0 bg-blue-500 text-white rounded-xl px-4 py-2 hover:bg-blue-400">Add Project</button>
         </div>
 
-        <div className="w-full bg-white rounded-xl overflow-hidden">
+        <div className="w-full bg-white overflow-hidden">
           <div className="overflow-x-auto grid grid-cols-2 md:grid-cols-3 gap-4">
             {console.log("currentProject", data)}
             {filteredProjects.map((project) => (
               <div key={project.id} className="shadow-lg bg-cover bg-center min-h-[20rem] w-full rounded-xl overflow-hidden flex flex-col justify-end relative" style={{ backgroundImage: `url(${project.attributes.hero_image_url})`, }}>
-                <div className="p-3 bg-purple-300 min-h-[5rem] w-full">
-                  <div className="bg-white shadow-xl p-3 rounded-lg grid grid-cols-7">
+                <div className="p-4 w-full backdrop-blur-sm bg-white/80 transition">
+                  <div className="grid grid-cols-7">
 
                     <div className="col-span-6">
                       <h2 className="font-bold truncate">{project.attributes.title}</h2>
-                      <p className="text-sm"> {project.attributes.description.split(" ").slice(0, 3).join(" ") ?? ""}...</p>
+                      {/* <p className="text-sm"> {project.attributes.description.split(" ").slice(0, 3).join(" ") ?? ""}...</p> */}
+                      <span className="mt-2 inline-block w-fit px-2 py-1 text-xs rounded-full text-violet-900 bg-violet-200 shadow-sm cursor-pointer hover:bg-violet-300 active:bg-violet-400 transition" >
+                        {project.relationships.category?.name}
+                      </span>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-1 w-full gap-2 col-span-1 ">
                       <div className="col-span-1 flex justify-end">
                         {console.log(modalForm)}
-                        <button onClick={(e) => (modalForm ? closeModal() : optionButton(project, e))} className="bg-black hover:bg-gray-800 shadow-xl rounded-2xl h-[3rem] w-[3rem] flex items-center justify-center">
+                        <button onClick={(e) => (modalForm ? closeModal() : optionButton(project, e))} className="bg-black hover:bg-gray-600 active:scale-95 transition shadow-xl rounded-2xl h-[3rem] w-[3rem] flex items-center justify-center">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-white">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
                           </svg>

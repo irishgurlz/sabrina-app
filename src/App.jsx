@@ -12,6 +12,7 @@ import LayoutHome from './Home/layoutHome/layoutHome';
 
 import Beranda from './Landing/beranda';
 import Project from './Landing/projects';
+import Articles from './Landing/articles';
 import Detail from "./Landing/detail";
 import DetailArticleLanding from "./Landing/detailArticle";
 
@@ -48,6 +49,8 @@ const App = () => {
             <Route path="/projects/:id" element={<Detail />} />
             <Route path="/articles/:id" element={<DetailArticleLanding />} />
             <Route path="/detail-project/:id" element={<Detail />} />
+
+            <Route path="/articles" element={<Articles />} />
 
           </Route>
 
