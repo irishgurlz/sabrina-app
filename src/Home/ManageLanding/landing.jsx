@@ -33,6 +33,7 @@ const Table = () => {
     const [itemsPerPageArticle, setItemsPerPageArticle] = useState(5);
     const [selectedHeroImage, setSelectedHeroImage] = useState(null);
     const [selectedAboutImage, setSelectedAboutImage] = useState(null);
+    const [successModal, setSuccessModal] = useState(false);
 
 
 
@@ -206,9 +207,6 @@ const Table = () => {
         contact_url: "",
     });
 
-    const handleChange = (field, value) => {
-        setDataProfile((prev) => ({ ...prev, [field]: value }));
-    };
 
     useEffect(() => {
         if (dataProfile?.attributes) {
@@ -235,11 +233,11 @@ const Table = () => {
 
         console.log("Selected image:", selectedHeroImage);
         if (selectedHeroImage) {
-            formToSend.append("hero_image_url", selectedHeroImage);
+            formToSend.append("hero_image", selectedHeroImage);
         }
 
         if (selectedAboutImage) {
-            formToSend.append("about_me_image_url", selectedAboutImage);
+            formToSend.append("about_me_image", selectedAboutImage);
         }
 
         const config = {
@@ -252,7 +250,11 @@ const Table = () => {
         axios.post(`https://api.kyuib.my.id/api/v1/landing-pages/1?_method=PUT`, formToSend, config)
             .then(() => {
                 setFetchStatus(true);
-                navigate("/dashboard/landing");
+                setSuccessModal(true);
+                setTimeout(() => {
+                    navigate("/dashboard/landing");
+                    setSuccessModal(false);
+                }, 3000);
             })
             .catch((err) => {
                 console.error("Failed to update profile:", err.response?.data || err);
@@ -278,7 +280,6 @@ const Table = () => {
             <div className="bg-white shadow-md rounded-2xl p-6 mb-12">
                 <div className="mb-4">
                     <h2 className="text-xl font-semibold text-gray-800">Profile Settings</h2>
-                    {/* <p className="text-sm text-gray-500">Update your display name, job title, and images here.</p> */}
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -289,7 +290,7 @@ const Table = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
-                                <input value={formData.job_title} onChange={(e) => setFormData({ ...formData, job_title: e.target.value })} type="text" className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm shadow-sm focus:ring focus:border-blue-500"/>
+                                <input value={formData.job_title} onChange={(e) => setFormData({ ...formData, job_title: e.target.value })} type="text" className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm shadow-sm focus:ring focus:border-blue-500" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">About Me Body</label>
@@ -318,12 +319,15 @@ const Table = () => {
                                 <input accept="image/*" onChange={(e) => setSelectedHeroImage(e.target.files[0])}
                                     type="file" className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
                                 />
+                                {selectedHeroImage && <img src={URL.createObjectURL(selectedHeroImage)} alt="Selected" className="mt-2 w-32 h-32 object-cover rounded-lg" />}
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">About Me Image URL</label>
                                 <input accept="image/*" onChange={(e) => setSelectedAboutImage(e.target.files[0])}
                                     type="file" className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
                                 />
+                                {selectedAboutImage && <img src={URL.createObjectURL(selectedAboutImage)} alt="Selected" className="mt-2 w-32 h-32 object-cover rounded-lg" />}
                             </div>
                         </div>
                     </div>
@@ -334,16 +338,23 @@ const Table = () => {
                         </button>
                     </div>
                 </form>
-
             </div>
 
-
+            {successModal && (
+                <div className="fixed inset-0 flex items-start justify-end mt-4 mr-8 bg-black bg-opacity-0">
+                    <div className="bg-green-400 rounded-lg p-4 flex justify-between gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 text-green-900">
+                            <path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clipRule="evenodd" />
+                        </svg>
+                        <p className="text-gray-700 font-semibold text-md">Profile updated successfully.</p>
+                    </div>
+                </div>
+            )}
 
 
             <div className="bg-white shadow-md rounded-2xl p-6">
                 <div className="mb-4">
                     <h2 className="text-xl font-semibold text-gray-800">Featured Projects </h2>
-                    {/* <p className="text-sm text-gray-500">Update your display name, job title, and images here.</p> */}
                 </div>
                 {/* ================================== Featured Project ================================== */}
                 <div>
@@ -423,7 +434,6 @@ const Table = () => {
                 {/* ================================== Featured Article ================================== */}
                 <div className="mb-4 mt-12">
                     <h2 className="text-xl font-semibold text-gray-800">Featured Articles</h2>
-                    {/* <p className="text-sm text-gray-500">Update your display name, job title, and images here.</p> */}
                 </div>
                 <div>
                     <form onSubmit={handleAddFeaturedArticle} className="mb-4 mt-4 lg:mt-0">
@@ -458,7 +468,6 @@ const Table = () => {
                             <thead className="bg-blue-600 text-white">
                                 <tr>
                                     <th className="px-4 py-3 ">Title</th>
-                                    {/* <th className="px-4 py-3 ">Category</th> */}
                                     <th className="px-4 py-3 text-center">Action</th>
                                 </tr>
                             </thead>
@@ -466,7 +475,6 @@ const Table = () => {
                                 {currentItemsArticle.map((item) => (
                                     <tr key={item.id} className="border-t hover:bg-gray-50 transition">
                                         <td className="px-4 py-3 ">{item.attributes.title}</td>
-                                        {/* <td className="px-4 py-3 ">{item.relationships.category.name}</td> */}
                                         <td className="px-4 py-3 flex justify-center space-x-2">
                                             <button className="bg-red-700 text-white p-1 rounded-lg">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
